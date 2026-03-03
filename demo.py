@@ -6,7 +6,16 @@ import sys
 import os
 
 # ==========================================
-# 1. MODEL ARCHITECTURE (Must match Training)
+# 1. SCANNET CLASS DEFINITIONS
+# ==========================================
+SCANNET_CLASSES = [
+    "Wall", "Floor", "Cabinet", "Bed", "Chair", "Sofa", "Table", "Door", "Window", 
+    "Bookshelf", "Picture", "Counter", "Desk", "Curtain", "Fridge", "ShowerCurtain", 
+    "Toilet", "Sink", "Bathtub", "OtherFurniture"
+]
+
+# ==========================================
+# 2. MODEL ARCHITECTURE (Must match Training)
 # ==========================================
 class LoRALinear(nn.Module):
     def __init__(self, in_features, out_features, rank=8, alpha=16, dropout=0.1):
@@ -36,14 +45,13 @@ class SpatialSynergyNet(nn.Module):
         return self.task_head(self.backbone(x))
 
 # ==========================================
-# 2. THE REAL DEMO VISUALIZATION
+# 3. THE REAL DEMO VISUALIZATION
 # ==========================================
 def run_demo(file_path=None):
     # --- 1. Load Data ---
     if file_path and os.path.exists(file_path):
         print(f"Loading Real Scene: {file_path}...")
         try:
-            # PyVista reads .ply files efficiently
             mesh = pv.read(file_path)
             points = mesh.points
         except Exception as e:
@@ -51,17 +59,16 @@ def run_demo(file_path=None):
             return
     else:
         print("No file provided. Generating SYNTHETIC demo data...")
-        # Fallback to synthetic floor/wall if no file is dragged in
         floor = np.column_stack([np.random.uniform(-2, 2, (2500, 2)), np.zeros(2500)])
         wall = np.column_stack([np.random.uniform(-2, 2, 2500), np.full(2500, 2), np.random.uniform(0, 2, 2500)])
         points = np.vstack([floor, wall])
 
-    # --- 2. Preprocess (Center & Normalize) ---
-    # This is CRITICAL. The model was trained on centered data.
+    # --- 2. CRITICAL FIX: Preprocess (Center X/Y only) ---
+    # Do NOT scale the room down. Keep the real-world scale and height (Z-axis).
     centroid = np.mean(points, axis=0)
-    points_centered = points - centroid
-    m = np.max(np.sqrt(np.sum(points_centered ** 2, axis=1)))
-    input_points = points_centered / m
+    input_points = np.copy(points)
+    input_points[:, 0] -= centroid[0] # Center X
+    input_points[:, 1] -= centroid[1] # Center Y
     
     input_tensor = torch.from_numpy(input_points).float().unsqueeze(0) # [1, N, 3]
 
@@ -69,8 +76,7 @@ def run_demo(file_path=None):
     print("Loading AI Model...")
     model = SpatialSynergyNet(num_classes=20)
     try:
-        # Load weights on CPU
-        state_dict = torch.load("SpatialSynergyNet_Production.pth", map_location='cpu', weights_only=True)
+        state_dict = torch.load("SpatialSynergyNet_Weighted.pth", map_location='cpu', weights_only=True)
         model.load_state_dict(state_dict, strict=False)
         print("Weights loaded successfully!")
     except FileNotFoundError:
@@ -87,26 +93,37 @@ def run_demo(file_path=None):
         
     print("Inference Complete! Opening 3D Visualization Window...")
     
-    # --- 5. Visualization ---
-    cloud = pv.PolyData(points) # Visualize original scale points
+    # --- 5. Visualization with Real Labels ---
+    cloud = pv.PolyData(points) 
     cloud['Semantic Class'] = predictions
     
     pl = pv.Plotter()
-    pl.add_text("Spatial-SynergyNet: Live Demo", font_size=18)
+    pl.add_text("Spatial-SynergyNet: Object Classification", font_size=18)
     pl.add_text("Press 'q' to close", position='upper_left', font_size=10)
     
-    # 'tab20' gives distinct colors for classes (chairs, floors, walls, etc.)
-    pl.add_mesh(cloud, scalars='Semantic Class', cmap='tab20', point_size=6, render_points_as_spheres=True)
+    # Use annotations to map class numbers to real names (Chair, Wall, Floor, etc.)
+    pl.add_mesh(
+        cloud, 
+        scalars='Semantic Class', 
+        cmap='tab20', 
+        point_size=6, 
+        render_points_as_spheres=True,
+        annotations={i: SCANNET_CLASSES[i] for i in range(20)},
+        scalar_bar_args={
+            'title': "Predicted Objects",
+            'label_font_size': 12,
+            'n_labels': 0, # Hides the messy numbers, keeps just your text annotations
+            'fmt': ''      # Removes decimal formatting
+        }
+    )
     
     pl.show()
 
 if __name__ == "__main__":
-    # Check if user dragged a file onto the script
     if len(sys.argv) > 1:
         run_demo(sys.argv[1])
     else:
-        # If run directly without file, try to find 'real_room.ply' automatically
         if os.path.exists("real_room.ply"):
             run_demo("real_room.ply")
         else:
-            run_demo() # Fallback to synthetic
+            run_demo()
