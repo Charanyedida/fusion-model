@@ -76,7 +76,7 @@ def run_demo(file_path=None):
     print("Loading AI Model...")
     model = SpatialSynergyNet(num_classes=20)
     try:
-        state_dict = torch.load("SpatialSynergyNet_Weighted.pth", map_location='cpu', weights_only=True)
+        state_dict = torch.load("model_three.pth", map_location='cpu', weights_only=True)
         model.load_state_dict(state_dict, strict=False)
         print("Weights loaded successfully!")
     except FileNotFoundError:
