@@ -28,6 +28,7 @@ class LoRALinear(nn.Module):
     def forward(self, x):
         return self.linear(x) + (self.lora_B(self.lora_A(x)) * self.scaling)
 
+# Assuming this script is running your latest High Capacity Model
 class SpatialSynergyNet(nn.Module):
     def __init__(self, num_classes=20):
         super().__init__()
@@ -36,21 +37,30 @@ class SpatialSynergyNet(nn.Module):
             nn.Linear(128, 384)
         )
         self.task_head = nn.Sequential(
-            LoRALinear(384, 128, rank=8),
+            nn.Linear(384, 512),
+            nn.LayerNorm(512),
             nn.ReLU(),
-            nn.Linear(128, num_classes)
+            nn.Dropout(0.3),
+            nn.Linear(512, 256),
+            nn.LayerNorm(256),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(256, num_classes) 
         )
 
     def forward(self, x):
         return self.task_head(self.backbone(x))
 
 # ==========================================
-# 3. THE REAL DEMO VISUALIZATION
+# 3. PRO UI DEMO VISUALIZATION
+# ==========================================
+# ==========================================
+# 3. PRO UI DEMO VISUALIZATION
 # ==========================================
 def run_demo(file_path=None):
     # --- 1. Load Data ---
     if file_path and os.path.exists(file_path):
-        print(f"Loading Real Scene: {file_path}...")
+        print(f"Loading Raw Scene: {file_path}...")
         try:
             mesh = pv.read(file_path)
             points = mesh.points
@@ -58,29 +68,27 @@ def run_demo(file_path=None):
             print(f"Error reading file: {e}")
             return
     else:
-        print("No file provided. Generating SYNTHETIC demo data...")
-        floor = np.column_stack([np.random.uniform(-2, 2, (2500, 2)), np.zeros(2500)])
-        wall = np.column_stack([np.random.uniform(-2, 2, 2500), np.full(2500, 2), np.random.uniform(0, 2, 2500)])
-        points = np.vstack([floor, wall])
+        print("Please provide a valid .ply file!")
+        return
 
-    # --- 2. CRITICAL FIX: Preprocess (Center X/Y only) ---
-    # Do NOT scale the room down. Keep the real-world scale and height (Z-axis).
+    # --- 2. Preprocess (Center X/Y) ---
     centroid = np.mean(points, axis=0)
     input_points = np.copy(points)
-    input_points[:, 0] -= centroid[0] # Center X
-    input_points[:, 1] -= centroid[1] # Center Y
+    input_points[:, 0] -= centroid[0] 
+    input_points[:, 1] -= centroid[1] 
     
-    input_tensor = torch.from_numpy(input_points).float().unsqueeze(0) # [1, N, 3]
+    input_tensor = torch.from_numpy(input_points).float().unsqueeze(0) 
 
     # --- 3. Load Model ---
     print("Loading AI Model...")
     model = SpatialSynergyNet(num_classes=20)
     try:
-        state_dict = torch.load("model_three.pth", map_location='cpu', weights_only=True)
+        # Make sure this matches your exact filename!
+        state_dict = torch.load("model_4.pth", map_location='cpu', weights_only=True)
         model.load_state_dict(state_dict, strict=False)
         print("Weights loaded successfully!")
     except FileNotFoundError:
-        print("ERROR: 'SpatialSynergyNet_Production.pth' not found. Please download it from Kaggle.")
+        print("ERROR: Model weights not found. Update the filename in the script if needed.")
         return
 
     model.eval()
@@ -88,42 +96,74 @@ def run_demo(file_path=None):
     # --- 4. Inference ---
     print("Running Spatial-SynergyNet Inference...")
     with torch.no_grad():
-        logits = model(input_tensor) # [1, N, 20]
-        predictions = torch.argmax(logits, dim=2).squeeze(0).numpy() # [N]
+        logits = model(input_tensor) 
+        predictions = torch.argmax(logits, dim=2).squeeze(0).numpy() 
         
-    print("Inference Complete! Opening 3D Visualization Window...")
+    print("Opening Split-Screen Visualization...")
     
-    # --- 5. Visualization with Real Labels ---
+    # --- 5. SPLIT-SCREEN UI VISUALIZATION ---
     cloud = pv.PolyData(points) 
     cloud['Semantic Class'] = predictions
     
-    pl = pv.Plotter()
-    pl.add_text("Spatial-SynergyNet: Object Classification", font_size=18)
-    pl.add_text("Press 'q' to close", position='upper_left', font_size=10)
+    # Create a wide 1x2 Plotter
+    pl = pv.Plotter(shape=(1, 2), window_size=[1800, 800])
     
-    # Use annotations to map class numbers to real names (Chair, Wall, Floor, etc.)
+    # Clean white background
+    pl.set_background("white") 
+
+    # ----------------------------------------
+    # LEFT WINDOW: Raw Geometry (Green)
+    # ----------------------------------------
+    pl.subplot(0, 0)
+    pl.add_text("Input: Raw Unlabeled 3D Scan", font_size=16, color='black')
+    
+    pl.add_mesh(
+        cloud, 
+        color='mediumseagreen', 
+        point_size=5, 
+        render_points_as_spheres=True
+    )
+        
+    # ----------------------------------------
+    # RIGHT WINDOW: AI Predictions
+    # ----------------------------------------
+    pl.subplot(0, 1)
+    pl.add_text("Output: Spatial-SynergyNet Prediction", font_size=16, color='black')
+    
+    # CRITICAL FIX: Vertical Legend on the Right Side
     pl.add_mesh(
         cloud, 
         scalars='Semantic Class', 
         cmap='tab20', 
-        point_size=6, 
+        point_size=5, 
         render_points_as_spheres=True,
         annotations={i: SCANNET_CLASSES[i] for i in range(20)},
         scalar_bar_args={
-            'title': "Predicted Objects",
-            'label_font_size': 12,
-            'n_labels': 0, # Hides the messy numbers, keeps just your text annotations
-            'fmt': ''      # Removes decimal formatting
+            'title': "Object Categories", 
+            'vertical': True,         # Forces the legend to be a vertical sidebar
+            'position_x': 0.85,       # Pushes it to the right edge of the window
+            'position_y': 0.1,        # Starts it a bit above the bottom
+            'width': 0.1,             # Makes the color boxes thin
+            'height': 0.8,            # Stretches it to use most of the vertical space
+            'n_labels': 0, 
+            'fmt': '',
+            'color': 'black',
+            'title_font_size': 14,
+            'label_font_size': 12
         }
     )
     
+    # Link the cameras so they spin together
+    pl.link_views()
+    
+    # Start the interactive window
     pl.show()
-
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         run_demo(sys.argv[1])
     else:
+        # Updated fallback logic to just use your provided ply
         if os.path.exists("real_room.ply"):
             run_demo("real_room.ply")
         else:
-            run_demo()
+            print("Drag and drop your .ply file onto this script!")
