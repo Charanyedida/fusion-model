@@ -54,9 +54,6 @@ class SpatialSynergyNet(nn.Module):
 # ==========================================
 # 3. PRO UI DEMO VISUALIZATION
 # ==========================================
-# ==========================================
-# 3. PRO UI DEMO VISUALIZATION
-# ==========================================
 def run_demo(file_path=None):
     # --- 1. Load Data ---
     if file_path and os.path.exists(file_path):
@@ -84,7 +81,7 @@ def run_demo(file_path=None):
     model = SpatialSynergyNet(num_classes=20)
     try:
         # Make sure this matches your exact filename!
-        state_dict = torch.load("SpatialSynergyNet_Ultimate.pth", map_location='cpu', weights_only=True)
+        state_dict = torch.load("model_4.pth", map_location='cpu', weights_only=True)
         model.load_state_dict(state_dict, strict=False)
         print("Weights loaded successfully!")
     except FileNotFoundError:
