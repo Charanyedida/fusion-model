@@ -212,14 +212,6 @@ def predict():
         if len(points) == 0:
             return jsonify({'error': 'Could not parse any points from the file'}), 400
 
-        # Subsample BEFORE inference to save memory (max 50k for Render free tier)
-        max_points = 50000
-        if len(points) > max_points:
-            print(f"  → Subsampling {len(points):,} → {max_points:,} points")
-            indices = np.random.choice(len(points), max_points, replace=False)
-            indices.sort()
-            points = points[indices]
-
         # Preprocess (center X/Y)
         centroid = np.mean(points, axis=0)
         input_points = np.copy(points)
