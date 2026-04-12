@@ -1,0 +1,109 @@
+.demo-section { padding: var(--section-pad) 0; background: var(--bg-secondary); }
+.demo-header { text-align: center; margin-bottom: 3rem; }
+
+/* Upload Zone */
+.upload-zone {
+  max-width: 700px; margin: 0 auto; padding: 3rem 2rem;
+  border: 2px dashed rgba(92,64,51,0.15); border-radius: var(--radius-lg);
+  text-align: center; cursor: pointer; transition: all 0.4s;
+  background: rgba(250,246,240,0.5);
+}
+.upload-zone:hover, .upload-zone.drag-over {
+  border-color: var(--gold); background: rgba(197,151,59,0.04);
+  box-shadow: 0 0 0 4px rgba(197,151,59,0.08);
+}
+.upload-zone.processing { cursor: default; border-color: rgba(45,80,22,0.3); }
+.upload-icon { font-size: 3rem; margin-bottom: 1rem; }
+.upload-icon.spinning { animation: spin 2s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.upload-zone h3 { font-family: var(--font-heading); font-size: 1.3rem; margin-bottom: 0.5rem; }
+.upload-zone p { font-size: 0.9rem; color: var(--text-secondary); }
+.upload-hint { margin-top: 1rem !important; }
+.upload-hint code {
+  font-family: var(--font-mono); background: rgba(92,64,51,0.06);
+  padding: 0.15rem 0.5rem; border-radius: 4px; color: var(--burgundy);
+}
+.error-text { color: var(--burgundy) !important; font-weight: 500; }
+
+/* Results Container */
+.results-container { margin-top: 1rem; }
+.results-toolbar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
+}
+.results-info { display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
+.results-file { font-weight: 600; font-size: 0.95rem; }
+.results-points, .results-classes {
+  font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-secondary);
+  padding: 0.25rem 0.75rem; background: rgba(92,64,51,0.05); border-radius: 6px;
+}
+
+/* Viewers Grid */
+.viewers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem; }
+.viewer-panel {
+  border-radius: var(--radius-lg); overflow: hidden;
+  box-shadow: var(--shadow-lg); border: 1px solid rgba(92,64,51,0.08);
+}
+.viewer-label {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.75rem 1.25rem; background: var(--ink);
+  font-family: var(--font-mono); font-size: 0.75rem;
+  color: var(--cream); letter-spacing: 0.05em;
+}
+.viewer-dot { width: 8px; height: 8px; border-radius: 50%; }
+.viewer-dot.raw { background: var(--gold); }
+.viewer-dot.pred { background: var(--forest-light); }
+.viewer-canvas { height: 500px; background: #FFFFFF; }
+
+/* Stats Dashboard */
+.stats-dashboard {
+  background: var(--bg-primary); border-radius: var(--radius-lg);
+  padding: 2rem; margin-bottom: 1.5rem;
+  border: 1px solid rgba(92,64,51,0.06);
+}
+.stats-dashboard h3 {
+  font-family: var(--font-heading); font-size: 1.2rem;
+  margin-bottom: 1.5rem; font-weight: 700;
+}
+.stats-bars { display: flex; flex-direction: column; gap: 0.6rem; }
+.stat-bar-row { display: flex; align-items: center; gap: 1rem; }
+.stat-bar-label {
+  width: 140px; min-width: 140px; font-size: 0.8rem; font-weight: 500;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.stat-bar-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.stat-bar-track {
+  flex: 1; height: 20px; background: rgba(92,64,51,0.04);
+  border-radius: 4px; overflow: hidden;
+}
+.stat-bar-fill {
+  height: 100%; border-radius: 4px;
+  transition: width 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.stat-bar-pct {
+  width: 55px; min-width: 55px; text-align: right;
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
+}
+
+/* Legend */
+.results-legend {
+  background: var(--bg-primary); border-radius: var(--radius-lg);
+  padding: 1.5rem 2rem; border: 1px solid rgba(92,64,51,0.06);
+}
+.results-legend h3 {
+  font-family: var(--font-heading); font-size: 1rem;
+  margin-bottom: 1rem; font-weight: 700;
+}
+.legend-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.legend-chip {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.3rem 0.8rem; border-radius: 6px;
+  background: rgba(92,64,51,0.04); font-size: 0.75rem; font-weight: 500;
+}
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+@media (max-width: 768px) {
+  .viewers-grid { grid-template-columns: 1fr; }
+  .viewer-canvas { height: 300px; }
+  .stat-bar-label { width: 100px; min-width: 100px; font-size: 0.7rem; }
+}

@@ -1,30 +1,97 @@
-# Spatial-SynergyNet 3D Object Detection Demo
+# Spatial-SynergyNet — 3D Semantic Segmentation
 
-This repository contains a demonstration script (`demo.py`) for Spatial-SynergyNet, a high-capacity model designed to perform 3D semantic segmentation on `ScanNet` point clouds.
+A high-capacity deep learning model for 3D semantic segmentation on **ScanNet** point clouds, with a **React + Three.js** web UI for in-browser interactive demos.
 
-## Requirements
+---
 
-Ensure you have Python installed, then install the required dependencies using the newly updated `requirements.txt` file.
+## 🚀 Quick Start
 
+### 1. Install Python dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-## Running the Demo
-
-The script can be executed directly from the terminal. It accepts a `.ply` file representing a 3D scan of a scene.
-
+### 2. Start the Flask backend
 ```bash
-python demo.py path/to/your/scene.ply
+python server.py
+```
+This starts the API at `http://localhost:5000`.
+
+### 3. Start the React frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Open `http://localhost:5173` in your browser.
+
+### 4. Run the demo
+- Upload a `.ply` file through the web UI
+- Or run the standalone PyVista demo: `python demo.py real_room.ply`
+
+---
+
+## 🌐 Web Interface
+
+The React UI includes:
+- **Hero** — Project overview with animated stats
+- **How It Works** — 4-step pipeline visualization
+- **Real-Life Applications** — 6 industry use cases (Architecture, Robotics, AR/VR, Healthcare, Heritage, Interior Design)
+- **Model Architecture** — Layer diagram and specifications
+- **20 ScanNet Classes** — Color-coded category chips
+- **Interactive Demo** — Upload a `.ply` file and see:
+  - Split-view 3D renderer (raw vs. predictions) powered by Three.js
+  - Live class distribution dashboard
+  - Drag-and-drop file upload
+
+---
+
+## 🏗️ Real-Life Applications
+
+| Industry | Use Case |
+|---|---|
+| **Architecture** | Floor plan extraction, BIM progress monitoring, quality control |
+| **Robotics** | Indoor navigation, obstacle detection, semantic path planning |
+| **Interior Design** | Virtual staging, room measurement, property tours |
+| **AR/VR** | Scene reconstruction, spatial anchors, mixed reality |
+| **Healthcare** | Assistive navigation for visually impaired, surgical room planning |
+| **Heritage** | 3D digitization of monuments, digital restoration |
+
+---
+
+## 📂 Project Structure
+
+```
+fusion-model/
+├── server.py             # Flask API backend (POST /api/predict)
+├── demo.py               # Standalone PyVista visualization
+├── model_4.pth           # Trained model weights
+├── real_room.ply          # Sample 3D scan
+├── requirements.txt       # Python dependencies
+├── frontend/             # React + Vite
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── index.css     # Global design system
+│   │   └── components/
+│   │       ├── Navbar.jsx
+│   │       ├── Hero.jsx
+│   │       ├── Pipeline.jsx
+│   │       ├── Applications.jsx
+│   │       ├── Architecture.jsx
+│   │       ├── ClassesGrid.jsx
+│   │       ├── DemoSection.jsx  # ← File upload + Three.js viewer
+│   │       └── Footer.jsx
+│   └── vite.config.js    # Proxy /api → Flask
+├── index.html            # Static fallback UI
+└── README.md
 ```
 
-If no arguments are provided, the script will default to using the `real_room.ply` file available in the directory.
-Alternatively, users can drag and drop a `.ply` file into the terminal window alongside the script.
+## ⚙️ Tech Stack
 
-## Visualization Interface
-
-When `demo.py` is run, a split-screen interactive pyvista visualization window will open:
-- **Left Panel:** Displays the raw, unlabeled 3D geometry of the scene in a clean green color format.
-- **Right Panel:** Displays the AI-generated semantic predictions colored according to their respective ScanNet object categories. A vertical legend is available on the right for reference.
-
-The cameras for both panels are linked—rotating, zooming, or panning in one panel will synchronously manipulate the other, allowing straightforward comparison between the raw scan and predictions.
+| Layer | Technology |
+|---|---|
+| Frontend | React, Three.js, React Three Fiber |
+| Backend | Flask, Flask-CORS |
+| ML | PyTorch, SpatialSynergyNet |
+| Data | NumPy, ScanNet PLY format |
+| Viz (standalone) | PyVista |

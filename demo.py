@@ -54,19 +54,29 @@ class SpatialSynergyNet(nn.Module):
 # ==========================================
 # 3. PRO UI DEMO VISUALIZATION
 # ==========================================
+
+# Old-school color palette for the dark theme
+DARK_BG = '#1A1714'
+PANEL_BG = '#0F1B33'
+CREAM = '#FAF6F0'
+GOLD = '#C5973B'
+BURGUNDY = '#6B1D2A'
+
 def run_demo(file_path=None):
     # --- 1. Load Data ---
     if file_path and os.path.exists(file_path):
-        print(f"Loading Raw Scene: {file_path}...")
+        print(f"  📡 Loading Raw Scene: {file_path}...")
         try:
             mesh = pv.read(file_path)
             points = mesh.points
         except Exception as e:
-            print(f"Error reading file: {e}")
+            print(f"  ✗ Error reading file: {e}")
             return
     else:
-        print("Please provide a valid .ply file!")
+        print("  ✗ Please provide a valid .ply file!")
         return
+
+    print(f"  ✓ Loaded {len(points):,} points")
 
     # --- 2. Preprocess (Center X/Y) ---
     centroid = np.mean(points, axis=0)
@@ -77,90 +87,156 @@ def run_demo(file_path=None):
     input_tensor = torch.from_numpy(input_points).float().unsqueeze(0) 
 
     # --- 3. Load Model ---
-    print("Loading AI Model...")
+    print("  🧠 Loading AI Model...")
     model = SpatialSynergyNet(num_classes=20)
     try:
-        # Make sure this matches your exact filename!
         state_dict = torch.load("model_4.pth", map_location='cpu', weights_only=True)
         model.load_state_dict(state_dict, strict=False)
-        print("Weights loaded successfully!")
+        print("  ✓ Weights loaded successfully!")
     except FileNotFoundError:
-        print("ERROR: Model weights not found. Update the filename in the script if needed.")
+        print("  ✗ ERROR: Model weights not found. Update the filename in the script.")
         return
 
     model.eval()
     
     # --- 4. Inference ---
-    print("Running Spatial-SynergyNet Inference...")
+    print("  🎨 Running Spatial-SynergyNet Inference...")
     with torch.no_grad():
         logits = model(input_tensor) 
         predictions = torch.argmax(logits, dim=2).squeeze(0).numpy() 
+
+    # --- 5. Compute Statistics ---
+    unique, counts = np.unique(predictions, return_counts=True)
+    total_points = len(predictions)
+    top_classes = sorted(zip(unique, counts), key=lambda x: -x[1])[:5]
+
+    stats_text = f"Total Points: {total_points:,}\n"
+    stats_text += f"Classes Found: {len(unique)}\n"
+    stats_text += "─" * 28 + "\n"
+    stats_text += "Top Detected Objects:\n"
+    for cls_id, count in top_classes:
+        pct = (count / total_points) * 100
+        stats_text += f"  {SCANNET_CLASSES[cls_id]:16s} {pct:5.1f}%\n"
         
-    print("Opening Split-Screen Visualization...")
+    print("\n  ╔══════════════════════════════╗")
+    print("  ║   INFERENCE RESULTS          ║")
+    print("  ╠══════════════════════════════╣")
+    for cls_id, count in top_classes:
+        pct = (count / total_points) * 100
+        bar = "█" * int(pct / 5) + "░" * (20 - int(pct / 5))
+        print(f"  ║ {SCANNET_CLASSES[cls_id]:16s} {bar} {pct:5.1f}% ║")
+    print("  ╚══════════════════════════════╝\n")
+
+    print("  🖥️  Opening Professional Visualization...")
     
-    # --- 5. SPLIT-SCREEN UI VISUALIZATION ---
+    # --- 6. PROFESSIONAL SPLIT-SCREEN VISUALIZATION ---
     cloud = pv.PolyData(points) 
     cloud['Semantic Class'] = predictions
     
-    # Create a wide 1x2 Plotter
-    pl = pv.Plotter(shape=(1, 2), window_size=[1800, 800])
+    # Wide 1x2 Plotter
+    pl = pv.Plotter(
+        shape=(1, 2), 
+        window_size=[1920, 900],
+        title="Spatial-SynergyNet | 3D Semantic Segmentation"
+    )
     
-    # Clean white background
-    pl.set_background("white") 
-
     # ----------------------------------------
-    # LEFT WINDOW: Raw Geometry (Green)
+    # LEFT WINDOW: Raw Geometry
     # ----------------------------------------
     pl.subplot(0, 0)
-    pl.add_text("Input: Raw Unlabeled 3D Scan", font_size=16, color='black')
+    pl.set_background(DARK_BG, top=PANEL_BG)
+    
+    pl.add_text(
+        "INPUT: Raw Unlabeled 3D Scan", 
+        font_size=14, 
+        color=CREAM,
+        position='upper_left',
+        font='courier'
+    )
+    
+    pl.add_text(
+        f"{total_points:,} points | .PLY format",
+        font_size=9,
+        color=GOLD,
+        position='lower_left',
+        font='courier'
+    )
     
     pl.add_mesh(
         cloud, 
-        color='mediumseagreen', 
-        point_size=5, 
-        render_points_as_spheres=True
+        color=GOLD, 
+        point_size=4, 
+        render_points_as_spheres=True,
+        opacity=0.85
     )
         
     # ----------------------------------------
     # RIGHT WINDOW: AI Predictions
     # ----------------------------------------
     pl.subplot(0, 1)
-    pl.add_text("Output: Spatial-SynergyNet Prediction", font_size=16, color='black')
+    pl.set_background(DARK_BG, top=PANEL_BG)
     
-    # CRITICAL FIX: Vertical Legend on the Right Side
+    pl.add_text(
+        "OUTPUT: Spatial-SynergyNet Prediction", 
+        font_size=14, 
+        color=CREAM,
+        position='upper_left',
+        font='courier'
+    )
+    
+    pl.add_text(
+        f"{len(unique)} classes detected",
+        font_size=9,
+        color=GOLD,
+        position='lower_left',
+        font='courier'
+    )
+    
+    pl.add_text(
+        stats_text,
+        font_size=8,
+        color=CREAM,
+        position='lower_right',
+        font='courier'
+    )
+    
     pl.add_mesh(
         cloud, 
         scalars='Semantic Class', 
         cmap='tab20', 
-        point_size=5, 
+        point_size=4, 
         render_points_as_spheres=True,
         annotations={i: SCANNET_CLASSES[i] for i in range(20)},
         scalar_bar_args={
             'title': "Object Categories", 
-            'vertical': True,         # Forces the legend to be a vertical sidebar
-            'position_x': 0.85,       # Pushes it to the right edge of the window
-            'position_y': 0.1,        # Starts it a bit above the bottom
-            'width': 0.1,             # Makes the color boxes thin
-            'height': 0.8,            # Stretches it to use most of the vertical space
+            'vertical': True,
+            'position_x': 0.85,
+            'position_y': 0.1,
+            'width': 0.1,
+            'height': 0.8,
             'n_labels': 0, 
             'fmt': '',
-            'color': 'black',
-            'title_font_size': 14,
-            'label_font_size': 12
+            'color': CREAM,
+            'title_font_size': 12,
+            'label_font_size': 10
         }
     )
     
-    # Link the cameras so they spin together
+    # Link views and launch
     pl.link_views()
-    
-    # Start the interactive window
     pl.show()
+
+
 if __name__ == "__main__":
+    print("\n  ╔═══════════════════════════════════════════╗")
+    print("  ║   SPATIAL-SYNERGYNET                      ║")
+    print("  ║   3D Semantic Segmentation Demo            ║")
+    print("  ╚═══════════════════════════════════════════╝\n")
+    
     if len(sys.argv) > 1:
         run_demo(sys.argv[1])
     else:
-        # Updated fallback logic to just use your provided ply
         if os.path.exists("real_room.ply"):
             run_demo("real_room.ply")
         else:
-            print("Drag and drop your .ply file onto this script!")
+            print("  ✗ No .ply file found. Usage: python demo.py <scene.ply>")

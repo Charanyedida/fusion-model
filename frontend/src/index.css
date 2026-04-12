@@ -1,0 +1,163 @@
+/* ============================================
+   SPATIAL-SYNERGYNET — Global Design System
+   Old-School Palette + Modern Animations
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* Old-School Color Palette */
+  --burgundy:       #6B1D2A;
+  --burgundy-deep:  #4A0E1C;
+  --burgundy-light: #8B2F42;
+  --navy:           #1B2A4A;
+  --navy-deep:      #0F1B33;
+  --navy-light:     #2A3F6A;
+  --forest:         #2D5016;
+  --forest-light:   #3F7A1F;
+  --gold:           #C5973B;
+  --gold-light:     #E2B75B;
+  --gold-pale:      #F5E6C8;
+  --cream:          #FAF6F0;
+  --ivory:          #F5F0E6;
+  --parchment:      #EDE4D3;
+  --warm-brown:     #5C4033;
+  --warm-gray:      #8B8178;
+  --charcoal:       #2C2825;
+  --ink:            #1A1714;
+
+  --bg-primary:     var(--cream);
+  --bg-secondary:   var(--ivory);
+  --bg-dark:        var(--navy-deep);
+  --text-primary:   var(--charcoal);
+  --text-secondary: var(--warm-gray);
+  --text-on-dark:   var(--cream);
+  --accent:         var(--gold);
+
+  --font-heading:   'Playfair Display', Georgia, serif;
+  --font-body:      'Inter', -apple-system, sans-serif;
+  --font-mono:      'JetBrains Mono', monospace;
+
+  --section-pad:    clamp(4rem, 8vw, 8rem);
+  --container-max:  1440px;
+  --shadow-sm:  0 2px 8px rgba(26,23,20,0.06);
+  --shadow-md:  0 8px 32px rgba(26,23,20,0.10);
+  --shadow-lg:  0 16px 48px rgba(26,23,20,0.14);
+  --radius:     12px;
+  --radius-lg:  20px;
+  --transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  line-height: 1.7;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 4vw, 3rem);
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+}
+
+.section-title {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+.section-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  max-width: 640px;
+  line-height: 1.8;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 2rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+  border: none;
+  font-family: var(--font-body);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--burgundy), var(--navy));
+  color: var(--cream);
+  box-shadow: 0 4px 16px rgba(107,29,42,0.25);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(107,29,42,0.35);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--charcoal);
+  border: 2px solid rgba(92,64,51,0.2);
+}
+
+.btn-secondary:hover {
+  border-color: var(--gold);
+  color: var(--warm-brown);
+  transform: translateY(-2px);
+}
+
+/* Scroll Reveal */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(50px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* Responsive media queries */
+@media (max-width: 1024px) {
+  :root { --section-pad: 4rem; }
+}
+
+@media (max-width: 768px) {
+  :root { --section-pad: 3rem; }
+}

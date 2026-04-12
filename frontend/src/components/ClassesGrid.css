@@ -1,0 +1,17 @@
+.classes-section { padding: var(--section-pad) 0; background: var(--bg-primary); border-top: 1px solid rgba(92,64,51,0.06); }
+.classes-header { text-align: center; margin-bottom: 3rem; }
+.classes-header .section-subtitle { margin: 0 auto; }
+.classes-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.75rem; }
+.class-chip {
+  display: flex; align-items: center; gap: 0.6rem; padding: 0.7rem 1rem;
+  border-radius: 10px; background: var(--bg-secondary);
+  border: 1px solid rgba(92,64,51,0.06);
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s; cursor: default;
+}
+.class-chip:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: rgba(197,151,59,0.2); }
+.chip-color { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+.chip-label { font-size: 0.8rem; font-weight: 500; white-space: nowrap; }
+.chip-id { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-secondary); margin-left: auto; }
+
+@media (max-width: 1024px) { .classes-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 768px) { .classes-grid { grid-template-columns: repeat(2, 1fr); } }
