@@ -169,7 +169,7 @@ export default function DemoSection() {
   // Compute colors for raw (gold) and predicted (class colors)
   const rawColors = useMemo(() => {
     if (!result) return []
-    const green = [0.24, 0.60, 0.34]  // mediumseagreen matching PyVista
+    const green = [0.18, 0.55, 0.34]  // #2E8B57 seagreen — darker green matching PyVista
     return result.points.map(() => green)
   }, [result])
 
