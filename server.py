@@ -69,7 +69,6 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB upload limit
 CORS(app, origins=[
     "http://localhost:5173",
     "https://fusion-model.vercel.app",
-    "https://*.vercel.app",
 ])
 
 # Load model once at startup
