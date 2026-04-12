@@ -39,7 +39,7 @@
   --font-mono:      'JetBrains Mono', monospace;
 
   --section-pad:    clamp(4rem, 8vw, 8rem);
-  --container-max:  1200px;
+  --container-max:  1440px;
   --shadow-sm:  0 2px 8px rgba(26,23,20,0.06);
   --shadow-md:  0 8px 32px rgba(26,23,20,0.10);
   --shadow-lg:  0 16px 48px rgba(26,23,20,0.14);

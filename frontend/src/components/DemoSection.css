@@ -53,7 +53,7 @@
 .viewer-dot { width: 8px; height: 8px; border-radius: 50%; }
 .viewer-dot.raw { background: var(--gold); }
 .viewer-dot.pred { background: var(--forest-light); }
-.viewer-canvas { height: 400px; background: #FFFFFF; }
+.viewer-canvas { height: 500px; background: #FFFFFF; }
 
 /* Stats Dashboard */
 .stats-dashboard {

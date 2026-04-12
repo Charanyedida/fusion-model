@@ -36,10 +36,6 @@ export default function Hero() {
     <section className="hero" id="hero">
       <div className="container hero-inner">
         <div className="hero-content">
-          <div className="hero-badge">
-            <span className="dot" />
-            Deep Learning &bull; 3D Vision
-          </div>
           <h1>
             Understand 3D Spaces<br />
             with <span className="highlight">Spatial</span>
