@@ -1,10 +1,13 @@
 """
 Spatial-SynergyNet — Flask Backend
 Serves model inference via REST API for the React frontend.
+Optimized for Render free tier (512 MB RAM).
 """
 
 import os
 import io
+import gc
+import struct
 import numpy as np
 import torch
 import torch.nn as nn
@@ -62,9 +65,10 @@ SCANNET_CLASSES = [
 # FLASK APP
 # ==========================================
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB upload limit
 CORS(app, origins=[
     "http://localhost:5173",
-    "https://fusion-model.vercel.app/",  # TODO: Replace with your exact Vercel URL for tighter security
+    "https://fusion-model.vercel.app",
 ])
 
 # Load model once at startup
@@ -81,28 +85,109 @@ except FileNotFoundError:
     print("✗ WARNING: model_4.pth not found. Inference will fail.")
 
 
-def parse_ply_with_pyvista(file_bytes):
-    """Parse a PLY file using PyVista for reliable binary/ASCII support."""
-    import pyvista as pv
-    import tempfile
-
-    # Save to temp file so PyVista can read it
-    tmp_path = os.path.join(tempfile.gettempdir(), 'upload_temp.ply')
-    with open(tmp_path, 'wb') as f:
-        f.write(file_bytes)
-
+# ==========================================
+# LIGHTWEIGHT PLY PARSER (replaces PyVista)
+# ==========================================
+def parse_ply_lightweight(file_bytes):
+    """
+    Parse a PLY file without PyVista.
+    Supports both ASCII and binary_little_endian formats.
+    Much lighter on memory than PyVista (~100MB less RAM).
+    """
     try:
-        mesh = pv.read(tmp_path)
-        points = np.array(mesh.points, dtype=np.float32)
-        print(f"  ✓ Parsed {len(points):,} points from PLY file")
-        return points
-    except Exception as e:
-        print(f"  ✗ PyVista parse error: {e}")
-        return np.array([], dtype=np.float32).reshape(0, 3)
-    finally:
-        if os.path.exists(tmp_path):
-            os.remove(tmp_path)
+        # Find end of header
+        header_end = file_bytes.find(b'end_header\n')
+        if header_end == -1:
+            header_end = file_bytes.find(b'end_header\r\n')
+            if header_end == -1:
+                print("  ✗ Invalid PLY: no end_header found")
+                return np.array([], dtype=np.float32).reshape(0, 3)
+            header_end += len(b'end_header\r\n')
+        else:
+            header_end += len(b'end_header\n')
 
+        header = file_bytes[:header_end].decode('ascii', errors='ignore')
+        data = file_bytes[header_end:]
+
+        # Parse header
+        num_vertices = 0
+        is_binary = False
+        properties = []
+
+        for line in header.split('\n'):
+            line = line.strip()
+            if line.startswith('element vertex'):
+                num_vertices = int(line.split()[-1])
+            elif line.startswith('format binary'):
+                is_binary = True
+            elif line.startswith('property'):
+                parts = line.split()
+                if len(parts) >= 3:
+                    properties.append((parts[1], parts[2]))
+
+        if num_vertices == 0:
+            print("  ✗ No vertices found in PLY header")
+            return np.array([], dtype=np.float32).reshape(0, 3)
+
+        # Find x, y, z property indices
+        prop_names = [p[1] for p in properties]
+        try:
+            x_idx = prop_names.index('x')
+            y_idx = prop_names.index('y')
+            z_idx = prop_names.index('z')
+        except ValueError:
+            print("  ✗ PLY file missing x/y/z properties")
+            return np.array([], dtype=np.float32).reshape(0, 3)
+
+        if is_binary:
+            # Binary parsing
+            # Build struct format from properties
+            type_map = {
+                'float': 'f', 'float32': 'f',
+                'double': 'd', 'float64': 'd',
+                'uchar': 'B', 'uint8': 'B',
+                'char': 'b', 'int8': 'b',
+                'ushort': 'H', 'uint16': 'H',
+                'short': 'h', 'int16': 'h',
+                'uint': 'I', 'uint32': 'I',
+                'int': 'i', 'int32': 'i',
+            }
+            fmt = '<'  # little endian
+            for ptype, _ in properties:
+                fmt += type_map.get(ptype, 'f')
+
+            vertex_size = struct.calcsize(fmt)
+            points = np.zeros((num_vertices, 3), dtype=np.float32)
+
+            for i in range(num_vertices):
+                offset = i * vertex_size
+                if offset + vertex_size > len(data):
+                    num_vertices = i
+                    points = points[:i]
+                    break
+                values = struct.unpack(fmt, data[offset:offset + vertex_size])
+                points[i, 0] = values[x_idx]
+                points[i, 1] = values[y_idx]
+                points[i, 2] = values[z_idx]
+        else:
+            # ASCII parsing
+            lines = data.decode('ascii', errors='ignore').strip().split('\n')
+            actual_count = min(num_vertices, len(lines))
+            points = np.zeros((actual_count, 3), dtype=np.float32)
+
+            for i in range(actual_count):
+                values = lines[i].strip().split()
+                if len(values) > max(x_idx, y_idx, z_idx):
+                    points[i, 0] = float(values[x_idx])
+                    points[i, 1] = float(values[y_idx])
+                    points[i, 2] = float(values[z_idx])
+
+        print(f"  ✓ Parsed {len(points):,} points from PLY file (lightweight parser)")
+        return points
+
+    except Exception as e:
+        print(f"  ✗ PLY parse error: {e}")
+        return np.array([], dtype=np.float32).reshape(0, 3)
 
 
 @app.route('/api/predict', methods=['POST'])
@@ -116,11 +201,24 @@ def predict():
         return jsonify({'error': 'Only .ply files are supported'}), 400
 
     try:
+        print(f"  → Received file: {file.filename}")
         file_bytes = file.read()
-        points = parse_ply_with_pyvista(file_bytes)
+        print(f"  → File size: {len(file_bytes):,} bytes")
+
+        points = parse_ply_lightweight(file_bytes)
+        del file_bytes  # Free memory immediately
+        gc.collect()
 
         if len(points) == 0:
             return jsonify({'error': 'Could not parse any points from the file'}), 400
+
+        # Subsample BEFORE inference to save memory (max 50k for Render free tier)
+        max_points = 50000
+        if len(points) > max_points:
+            print(f"  → Subsampling {len(points):,} → {max_points:,} points")
+            indices = np.random.choice(len(points), max_points, replace=False)
+            indices.sort()
+            points = points[indices]
 
         # Preprocess (center X/Y)
         centroid = np.mean(points, axis=0)
@@ -129,11 +227,17 @@ def predict():
         input_points[:, 1] -= centroid[1]
 
         input_tensor = torch.from_numpy(input_points).float().unsqueeze(0)
+        del input_points  # Free memory
+        gc.collect()
 
         # Inference
+        print("  → Running inference...")
         with torch.no_grad():
             logits = model(input_tensor)
             predictions = torch.argmax(logits, dim=2).squeeze(0).numpy()
+
+        del input_tensor, logits  # Free memory
+        gc.collect()
 
         # Compute statistics
         unique, counts = np.unique(predictions, return_counts=True)
@@ -142,20 +246,9 @@ def predict():
         for cls_id, count in zip(unique, counts):
             class_counts[SCANNET_CLASSES[int(cls_id)]] = int(count)
 
-        # Subsample for browser performance (max 100k points)
-        max_points = 100000
-        if len(points) > max_points:
-            indices = np.random.choice(len(points), max_points, replace=False)
-            indices.sort()
-            points_out = points[indices].tolist()
-            preds_out = predictions[indices].tolist()
-        else:
-            points_out = points.tolist()
-            preds_out = predictions.tolist()
-
-        return jsonify({
-            'points': points_out,
-            'predictions': preds_out,
+        response = jsonify({
+            'points': points.tolist(),
+            'predictions': predictions.tolist(),
             'stats': {
                 'total_points': total,
                 'classes_found': int(len(unique)),
@@ -164,7 +257,15 @@ def predict():
             'classes': SCANNET_CLASSES
         })
 
+        del points, predictions  # Free memory
+        gc.collect()
+
+        print(f"  ✓ Inference complete! {total:,} points, {len(unique)} classes")
+        return response
+
     except Exception as e:
+        gc.collect()
+        print(f"  ✗ Error: {e}")
         return jsonify({'error': str(e)}), 500
 
 
