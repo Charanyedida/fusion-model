@@ -1,0 +1,56 @@
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  padding: 1rem 0;
+  transition: background 0.4s, box-shadow 0.4s, padding 0.4s;
+}
+.navbar.scrolled {
+  background: rgba(250,246,240,0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 1px 0 rgba(92,64,51,0.08);
+  padding: 0.6rem 0;
+}
+.nav-inner { display: flex; align-items: center; justify-content: space-between; }
+.nav-logo { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; }
+.nav-logo-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--burgundy), var(--navy));
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gold-light); font-size: 1.1rem; font-weight: 700;
+  font-family: var(--font-heading); box-shadow: var(--shadow-sm);
+}
+.nav-logo-text { font-family: var(--font-heading); font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; }
+.nav-links { display: flex; align-items: center; gap: 2rem; }
+.nav-links a {
+  font-size: 0.9rem; font-weight: 500; color: var(--text-secondary);
+  cursor: pointer; position: relative; transition: color 0.3s;
+}
+.nav-links a::after {
+  content: ''; position: absolute; bottom: -4px; left: 0;
+  width: 0; height: 2px; background: var(--gold); transition: width 0.3s;
+}
+.nav-links a:hover { color: var(--charcoal); }
+.nav-links a:hover::after { width: 100%; }
+.nav-cta {
+  background: linear-gradient(135deg, var(--burgundy), var(--burgundy-deep)) !important;
+  color: var(--cream) !important; padding: 0.6rem 1.5rem;
+  border-radius: 8px; font-weight: 600 !important;
+  transition: transform 0.3s, box-shadow 0.3s !important;
+}
+.nav-cta::after { display: none !important; }
+.nav-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(107,29,42,0.3); }
+.nav-hamburger {
+  display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px;
+}
+.nav-hamburger span {
+  width: 24px; height: 2px; background: var(--charcoal); border-radius: 2px; transition: 0.4s;
+}
+
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav-links.open {
+    display: flex; flex-direction: column; position: absolute;
+    top: 100%; left: 0; right: 0; background: rgba(250,246,240,0.98);
+    backdrop-filter: blur(20px); padding: 2rem; gap: 1.25rem; box-shadow: var(--shadow-md);
+  }
+  .nav-hamburger { display: flex; }
+}

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Spatial-SynergyNet — A high-capacity deep learning model for 3D semantic segmentation of indoor scenes using ScanNet point clouds. Applications in architecture, robotics, AR/VR, and more.">
+  <title>Spatial-SynergyNet | 3D Semantic Segmentation</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧊</text></svg>">
+</head>
+<body>
+
+  <!-- ========================================
+       NAVIGATION
+       ======================================== -->
+  <nav class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <a href="#" class="nav-logo">
+        <div class="nav-logo-icon">S</div>
+        <span class="nav-logo-text">Spatial-SynergyNet</span>
+      </a>
+      <div class="nav-links" id="navLinks">
+        <a href="#pipeline">How It Works</a>
+        <a href="#applications">Applications</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#classes">Classes</a>
+        <a href="#demo" class="nav-cta">Try Demo</a>
+      </div>
+      <div class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========================================
+       HERO SECTION
+       ======================================== -->
+  <section class="hero" id="hero">
+    <div class="container hero-inner">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="dot"></span>
+          Deep Learning &bull; 3D Vision
+        </div>
+        <h1>
+          Understand 3D Spaces<br>
+          with <span class="highlight">Spatial</span><span class="highlight-gold">SynergyNet</span>
+        </h1>
+        <p class="hero-description">
+          A high-capacity neural network that transforms raw 3D point cloud scans into
+          semantically labeled scenes — identifying walls, furniture, fixtures, and more
+          with state-of-the-art accuracy.
+        </p>
+        <div class="hero-actions">
+          <a href="#demo" class="btn btn-primary">
+            ▶ Run the Demo
+          </a>
+          <a href="#applications" class="btn btn-secondary">
+            Explore Use Cases →
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="number" data-target="20">0</div>
+            <div class="label">Object Categories</div>
+          </div>
+          <div class="hero-stat">
+            <div class="number" data-target="3">0</div>
+            <div class="label">Input Dimensions</div>
+          </div>
+          <div class="hero-stat">
+            <div class="number" data-target="5">0</div>
+            <div class="label">Trained Models</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-card">
+          <div class="hero-card-content">
+            <div class="icon-3d">🧊</div>
+            <h3>3D Scene Understanding</h3>
+            <p>Point Cloud → Semantic Labels</p>
+          </div>
+        </div>
+        <div class="float-tag">
+          <span class="tag-dot green"></span> Wall Detected
+        </div>
+        <div class="float-tag">
+          <span class="tag-dot gold"></span> Table Classified
+        </div>
+        <div class="float-tag">
+          <span class="tag-dot maroon"></span> Chair Identified
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       HOW IT WORKS — PIPELINE
+       ======================================== -->
+  <section class="pipeline" id="pipeline">
+    <div class="container">
+      <div class="pipeline-header">
+        <div class="section-label">Pipeline</div>
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-subtitle">
+          From raw 3D scans to intelligent semantic understanding — our four-stage pipeline 
+          processes point clouds in real-time.
+        </p>
+      </div>
+      <div class="pipeline-grid stagger-children">
+        <div class="pipeline-step reveal">
+          <div class="pipeline-icon">📡</div>
+          <div class="pipeline-num">Step 01</div>
+          <h3>3D Scanning</h3>
+          <p>Capture raw point cloud data from LiDAR sensors, depth cameras, or structured light scanners in .PLY format.</p>
+        </div>
+        <div class="pipeline-step reveal">
+          <div class="pipeline-icon">⚙️</div>
+          <div class="pipeline-num">Step 02</div>
+          <h3>Preprocessing</h3>
+          <p>Center and normalize XYZ coordinates. Apply spatial transformations for model-ready tensor preparation.</p>
+        </div>
+        <div class="pipeline-step reveal">
+          <div class="pipeline-icon">🧠</div>
+          <div class="pipeline-num">Step 03</div>
+          <h3>AI Inference</h3>
+          <p>SpatialSynergyNet's deep backbone + task head processes each point through 384-dim feature space with LoRA-enhanced layers.</p>
+        </div>
+        <div class="pipeline-step reveal">
+          <div class="pipeline-icon">🎨</div>
+          <div class="pipeline-num">Step 04</div>
+          <h3>Semantic Map</h3>
+          <p>Each 3D point receives a semantic label from 20 ScanNet categories — visualized as a color-coded interactive scene.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       REAL-LIFE APPLICATIONS
+       ======================================== -->
+  <section class="applications" id="applications">
+    <div class="container">
+      <div class="applications-header">
+        <div class="section-label">Impact</div>
+        <h2 class="section-title">Real-Life Applications</h2>
+        <p class="section-subtitle">
+          3D semantic segmentation is transforming industries worldwide. Here's how 
+          Spatial-SynergyNet's technology is being applied in practice.
+        </p>
+      </div>
+      <div class="app-grid stagger-children">
+
+        <!-- Card 1: Architecture -->
+        <div class="app-card reveal">
+          <div class="app-icon">🏗️</div>
+          <h3>Architecture &amp; Construction</h3>
+          <p>
+            Automate floor-plan extraction from 3D scans of buildings under construction. 
+            Monitor construction progress by comparing scanned geometry against BIM models. 
+            Detect structural deviations in real-time, reducing costly rework by up to 30%.
+            Used by firms like Matterport and OpenSpace for site documentation.
+          </p>
+          <div class="app-tags">
+            <span>BIM Integration</span>
+            <span>Progress Tracking</span>
+            <span>Quality Control</span>
+          </div>
+        </div>
+
+        <!-- Card 2: Robotics -->
+        <div class="app-card reveal">
+          <div class="app-icon">🤖</div>
+          <h3>Robotics &amp; Autonomous Navigation</h3>
+          <p>
+            Enable robots and autonomous vehicles to understand indoor environments — 
+            distinguishing navigable floors from obstacles like furniture and walls. 
+            Critical for warehouse robots (Amazon), delivery drones, and assistive robots 
+            in hospitals. Reduces collision rates by enabling semantic path planning.
+          </p>
+          <div class="app-tags">
+            <span>Path Planning</span>
+            <span>Obstacle Detection</span>
+            <span>SLAM</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Interior Design -->
+        <div class="app-card reveal">
+          <div class="app-icon">🏠</div>
+          <h3>Interior Design &amp; Real Estate</h3>
+          <p>
+            Virtually stage empty rooms by understanding which surfaces are floors, walls, 
+            and windows. Real estate platforms like Zillow use 3D segmentation for immersive 
+            property tours. Interior designers leverage it to auto-measure room dimensions 
+            and plan furniture placement with centimeter-level accuracy.
+          </p>
+          <div class="app-tags">
+            <span>Virtual Staging</span>
+            <span>Room Measurement</span>
+            <span>Property Tours</span>
+          </div>
+        </div>
+
+        <!-- Card 4: AR/VR -->
+        <div class="app-card reveal">
+          <div class="app-icon">🎮</div>
+          <h3>AR/VR &amp; Immersive Gaming</h3>
+          <p>
+            Reconstruct real-world rooms as playable game environments. Apple Vision Pro 
+            and Meta Quest use scene understanding to anchor virtual objects to real furniture. 
+            Semantic labels enable physics-aware interactions — a virtual ball bounces off 
+            a real table, and digital characters sit on your actual sofa.
+          </p>
+          <div class="app-tags">
+            <span>Scene Reconstruction</span>
+            <span>Mixed Reality</span>
+            <span>Spatial Anchors</span>
+          </div>
+        </div>
+
+        <!-- Card 5: Healthcare -->
+        <div class="app-card reveal">
+          <div class="app-icon">🏥</div>
+          <h3>Healthcare &amp; Accessibility</h3>
+          <p>
+            Assist visually impaired individuals by narrating surrounding objects — 
+            "door ahead, chair to your left." Smart glasses with embedded 3D segmentation 
+            provide real-time audio descriptions of indoor spaces. Also used in surgical 
+            planning where operating room layouts are digitized for optimal equipment placement.
+          </p>
+          <div class="app-tags">
+            <span>Assistive Tech</span>
+            <span>Surgical Planning</span>
+            <span>Smart Glasses</span>
+          </div>
+        </div>
+
+        <!-- Card 6: Heritage -->
+        <div class="app-card reveal">
+          <div class="app-icon">🏛️</div>
+          <h3>Cultural Heritage &amp; Preservation</h3>
+          <p>
+            Digitize historical monuments, temples, and museums in full 3D with semantic 
+            annotations. UNESCO uses point cloud segmentation to catalog structural elements 
+            of endangered heritage sites. Enables precise digital restoration — architects can 
+            reconstruct damaged sections using classified geometry of intact areas.
+          </p>
+          <div class="app-tags">
+            <span>3D Digitization</span>
+            <span>Digital Restoration</span>
+            <span>UNESCO Sites</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       MODEL ARCHITECTURE
+       ======================================== -->
+  <section class="architecture" id="architecture">
+    <div class="container">
+      <div class="arch-header">
+        <div class="section-label">Under the Hood</div>
+        <h2 class="section-title" style="color: var(--cream);">Model Architecture</h2>
+        <p class="section-subtitle">
+          SpatialSynergyNet combines a lightweight backbone with a deep task-specific 
+          classification head, achieving efficient per-point semantic labeling.
+        </p>
+      </div>
+
+      <!-- Architecture Diagram -->
+      <div class="arch-diagram reveal">
+        <div class="arch-block input">
+          <h4>Input</h4>
+          <p>XYZ Points (3D)</p>
+        </div>
+        <span class="arch-arrow">→</span>
+        <div class="arch-block backbone">
+          <h4>Backbone</h4>
+          <p>3 → 128 → 384</p>
+        </div>
+        <span class="arch-arrow">→</span>
+        <div class="arch-block head">
+          <h4>Task Head</h4>
+          <p>384 → 512 → 256</p>
+        </div>
+        <span class="arch-arrow">→</span>
+        <div class="arch-block output">
+          <h4>Output</h4>
+          <p>20 Classes</p>
+        </div>
+      </div>
+
+      <!-- Architecture Stats -->
+      <div class="arch-stats stagger-children">
+        <div class="arch-stat-card reveal">
+          <div class="stat-val">384</div>
+          <div class="stat-label">Feature Dimensions</div>
+        </div>
+        <div class="arch-stat-card reveal">
+          <div class="stat-val">LoRA</div>
+          <div class="stat-label">Parameter-Efficient Tuning</div>
+        </div>
+        <div class="arch-stat-card reveal">
+          <div class="stat-val">LayerNorm</div>
+          <div class="stat-label">Normalization Strategy</div>
+        </div>
+        <div class="arch-stat-card reveal">
+          <div class="stat-val">0.3</div>
+          <div class="stat-label">Dropout Rate</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       SCANNET CLASSES
+       ======================================== -->
+  <section class="classes-section" id="classes">
+    <div class="container">
+      <div class="classes-header">
+        <div class="section-label">Categories</div>
+        <h2 class="section-title">20 ScanNet Object Classes</h2>
+        <p class="section-subtitle">
+          Every point in the 3D scan is assigned one of these semantic labels, 
+          enabling comprehensive scene understanding.
+        </p>
+      </div>
+      <div class="classes-grid stagger-children" id="classesGrid">
+        <!-- Populated by JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       TRY THE DEMO
+       ======================================== -->
+  <section class="demo-section" id="demo">
+    <div class="container">
+      <div class="demo-header">
+        <div class="section-label">Get Started</div>
+        <h2 class="section-title">Try the Demo</h2>
+        <p class="section-subtitle">
+          Run Spatial-SynergyNet locally on your machine with just a few commands.
+        </p>
+      </div>
+      <div class="demo-content">
+        <!-- Terminal -->
+        <div class="demo-terminal reveal-left">
+          <div class="terminal-bar">
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-title">PowerShell</span>
+          </div>
+          <div class="terminal-body">
+            <div><span class="comment"># Clone the repository</span></div>
+            <div><span class="prompt">❯ </span><span class="cmd">git clone https://github.com/your-repo/fusion-model.git</span></div>
+            <div><span class="prompt">❯ </span><span class="cmd">cd fusion-model</span></div>
+            <div>&nbsp;</div>
+            <div><span class="comment"># Install dependencies</span></div>
+            <div><span class="prompt">❯ </span><span class="cmd">pip install -r requirements.txt</span></div>
+            <div><span class="output">Successfully installed torch numpy pyvista</span></div>
+            <div>&nbsp;</div>
+            <div><span class="comment"># Run the demo</span></div>
+            <div><span class="prompt">❯ </span><span class="cmd">python demo.py real_room.ply</span></div>
+            <div><span class="output">Loading Raw Scene: real_room.ply...</span></div>
+            <div><span class="output">Loading AI Model...</span></div>
+            <div><span class="success">✓ Weights loaded successfully!</span></div>
+            <div><span class="output">Running Spatial-SynergyNet Inference...</span></div>
+            <div><span class="success">✓ Opening Split-Screen Visualization...</span></div>
+          </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="demo-instructions reveal-right">
+          <h3>Quick Start Guide</h3>
+          <div class="demo-step">
+            <div class="demo-step-num">1</div>
+            <div class="demo-step-text">
+              <h4>Install Requirements</h4>
+              <p>Run <code>pip install -r requirements.txt</code> to install PyTorch, NumPy, and PyVista.</p>
+            </div>
+          </div>
+          <div class="demo-step">
+            <div class="demo-step-num">2</div>
+            <div class="demo-step-text">
+              <h4>Prepare Your 3D Scan</h4>
+              <p>Use any <code>.ply</code> point cloud file, or use the included <code>real_room.ply</code> sample scan.</p>
+            </div>
+          </div>
+          <div class="demo-step">
+            <div class="demo-step-num">3</div>
+            <div class="demo-step-text">
+              <h4>Run the Demo Script</h4>
+              <p>Execute <code>python demo.py your_scan.ply</code> to launch the interactive visualization window.</p>
+            </div>
+          </div>
+          <div class="demo-step">
+            <div class="demo-step-num">4</div>
+            <div class="demo-step-text">
+              <h4>Explore the Results</h4>
+              <p>The split-screen view shows raw geometry (left) alongside AI predictions (right). Rotate, zoom, and pan to explore.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech Strip -->
+  <div class="tech-strip">
+    <div class="container">
+      <div class="tech-inner">
+        <div class="tech-badge">
+          <div class="tech-icon">🔥</div> PyTorch
+        </div>
+        <div class="tech-badge">
+          <div class="tech-icon">📊</div> NumPy
+        </div>
+        <div class="tech-badge">
+          <div class="tech-icon">🖥️</div> PyVista
+        </div>
+        <div class="tech-badge">
+          <div class="tech-icon">📐</div> ScanNet
+        </div>
+        <div class="tech-badge">
+          <div class="tech-icon">🧬</div> LoRA
+        </div>
+        <div class="tech-badge">
+          <div class="tech-icon">🐍</div> Python
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================
+       FOOTER
+       ======================================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <h3>Spatial-SynergyNet</h3>
+          <p>
+            High-capacity 3D semantic segmentation for indoor scene understanding. 
+            Built with PyTorch and trained on the ScanNet benchmark dataset.
+          </p>
+        </div>
+        <div>
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="#pipeline">How It Works</a></li>
+            <li><a href="#applications">Applications</a></li>
+            <li><a href="#architecture">Architecture</a></li>
+            <li><a href="#demo">Try Demo</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#">ScanNet Dataset</a></li>
+            <li><a href="#">Research Paper</a></li>
+            <li><a href="#">GitHub Repository</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Spatial-SynergyNet. All rights reserved.</span>
+        <span>Built with ❤️ and <a href="https://pytorch.org" target="_blank">PyTorch</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

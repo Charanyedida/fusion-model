@@ -1,0 +1,44 @@
+.architecture {
+  padding: var(--section-pad) 0;
+  background: linear-gradient(170deg, var(--navy-deep), var(--charcoal));
+  color: var(--cream); position: relative; overflow: hidden;
+}
+.architecture::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 20% 30%, rgba(197,151,59,0.06) 0%, transparent 50%),
+              radial-gradient(circle at 80% 70%, rgba(107,29,42,0.05) 0%, transparent 50%);
+}
+.arch-header { text-align: center; margin-bottom: 4rem; position: relative; z-index: 1; }
+.arch-header .section-subtitle { margin: 0 auto; }
+.arch-diagram {
+  display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+  flex-wrap: wrap; position: relative; z-index: 1; margin-bottom: 3rem;
+}
+.arch-block {
+  padding: 1rem 1.5rem; border-radius: var(--radius); text-align: center;
+  min-width: 120px; transition: transform 0.3s;
+}
+.arch-block:hover { transform: translateY(-4px); }
+.arch-block.input   { background: rgba(197,151,59,0.15); border: 1px solid rgba(197,151,59,0.3); }
+.arch-block.backbone { background: rgba(107,29,42,0.15); border: 1px solid rgba(107,29,42,0.3); }
+.arch-block.head    { background: rgba(45,80,22,0.15); border: 1px solid rgba(45,80,22,0.3); }
+.arch-block.output  { background: rgba(27,42,74,0.2); border: 1px solid rgba(42,63,106,0.4); }
+.arch-block h4 { font-family: var(--font-heading); font-size: 0.95rem; margin-bottom: 0.25rem; }
+.arch-block p { font-size: 0.7rem; font-family: var(--font-mono); color: rgba(250,246,240,0.5); }
+.arch-arrow { font-size: 1.3rem; color: var(--gold); opacity: 0.5; }
+.arch-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;
+  position: relative; z-index: 1;
+}
+.arch-stat-card {
+  text-align: center; padding: 1.5rem; border-radius: var(--radius);
+  background: rgba(250,246,240,0.04); border: 1px solid rgba(250,246,240,0.06);
+}
+.stat-val { font-family: var(--font-heading); font-size: 1.8rem; font-weight: 700; color: var(--gold-light); margin-bottom: 0.25rem; }
+.stat-label { font-size: 0.8rem; color: rgba(250,246,240,0.5); }
+
+@media (max-width: 768px) {
+  .arch-diagram { flex-direction: column; }
+  .arch-arrow { transform: rotate(90deg); }
+  .arch-stats { grid-template-columns: 1fr 1fr; }
+}
