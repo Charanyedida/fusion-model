@@ -53,11 +53,13 @@ export default function Hero() {
             }}>
               ▶ Run the Demo
             </a>
-            <a href="#applications" className="btn btn-secondary" onClick={(e) => {
-              e.preventDefault()
-              document.getElementById('applications')?.scrollIntoView({ behavior: 'smooth' })
-            }}>
-              Explore Use Cases →
+            <a
+              href="https://github.com/Charanyedida/fusion-model"
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-secondary"
+            >
+              ⭐ View on GitHub
             </a>
           </div>
           <div className="hero-stats" ref={statsRef}>

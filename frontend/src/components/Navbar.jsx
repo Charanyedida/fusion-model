@@ -28,6 +28,7 @@ export default function Navbar() {
           <a onClick={() => scrollTo('applications')}>Applications</a>
           <a onClick={() => scrollTo('architecture')}>Architecture</a>
           <a onClick={() => scrollTo('classes')}>Classes</a>
+          <a href="https://github.com/Charanyedida/fusion-model" target="_blank" rel="noreferrer">GitHub</a>
           <a onClick={() => scrollTo('demo')} className="nav-cta">Try Demo</a>
         </div>
         <div className="nav-hamburger" onClick={() => setMenuOpen(!menuOpen)}>

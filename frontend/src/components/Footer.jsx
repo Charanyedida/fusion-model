@@ -41,10 +41,10 @@ export default function Footer() {
             <div>
               <h4>Resources</h4>
               <ul>
-                <li><a href="#">Documentation</a></li>
-                <li><a href="#">ScanNet Dataset</a></li>
-                <li><a href="#">Research Paper</a></li>
-                <li><a href="#">GitHub Repository</a></li>
+                <li><a href="https://github.com/Charanyedida/fusion-model" target="_blank" rel="noreferrer">GitHub Repository</a></li>
+                <li><a href="https://github.com/Charanyedida/fusion-model#readme" target="_blank" rel="noreferrer">Documentation</a></li>
+                <li><a href="https://github.com/Charanyedida/fusion-model/issues" target="_blank" rel="noreferrer">Report Issues</a></li>
+                <li><a href="http://www.scan-net.org/" target="_blank" rel="noreferrer">ScanNet Dataset</a></li>
               </ul>
             </div>
           </div>
