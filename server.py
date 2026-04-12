@@ -64,7 +64,7 @@ SCANNET_CLASSES = [
 app = Flask(__name__)
 CORS(app, origins=[
     "http://localhost:5173",
-    "https://*.vercel.app",  # TODO: Replace with your exact Vercel URL for tighter security
+    "https://fusion-model.vercel.app/", 
 ])
 
 # Load model once at startup
