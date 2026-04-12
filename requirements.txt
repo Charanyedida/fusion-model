@@ -1,5 +1,7 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
 torch
 numpy
 pyvista
 flask
 flask-cors
+gunicorn

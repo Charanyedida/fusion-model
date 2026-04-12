@@ -62,7 +62,10 @@ SCANNET_CLASSES = [
 # FLASK APP
 # ==========================================
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=[
+    "http://localhost:5173",
+    "https://*.vercel.app",  # TODO: Replace with your exact Vercel URL for tighter security
+])
 
 # Load model once at startup
 print("Loading SpatialSynergyNet model...")
@@ -173,6 +176,7 @@ def health():
 if __name__ == '__main__':
     print("\n  ╔═══════════════════════════════════════╗")
     print("  ║   SPATIAL-SYNERGYNET API SERVER       ║")
-    print("  ║   http://localhost:5000                ║")
+    port = int(os.environ.get('PORT', 5000))
+    print(f"  ║   http://localhost:{port}                ║")
     print("  ╚═══════════════════════════════════════╝\n")
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=True)

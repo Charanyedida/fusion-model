@@ -140,7 +140,8 @@ export default function DemoSection() {
 
     try {
       setStatus('processing')
-      const res = await fetch('/api/predict', { method: 'POST', body: formData })
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const res = await fetch(`${apiUrl}/api/predict`, { method: 'POST', body: formData })
       const data = await res.json()
 
       if (!res.ok) {
