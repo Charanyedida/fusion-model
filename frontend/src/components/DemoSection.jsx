@@ -114,8 +114,15 @@ function Viewer3D({ points, colors, pointSize }) {
 }
 
 /* ---- MAIN DEMO SECTION ---- */
+const SAMPLE_SCENES = [
+  'scene0000_00', 'scene0000_01', 'scene0000_02',
+  'scene0001_00', 'scene0001_01', 'scene0002_00',
+  'scene0002_01', 'scene0003_00', 'scene0003_01',
+  'scene0003_02'
+]
+
 export default function DemoSection() {
-  const [status, setStatus] = useState('idle') // idle | uploading | processing | done | error
+  const [status, setStatus] = useState('idle') // idle | fetching | uploading | processing | done | error
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
   const [dragOver, setDragOver] = useState(false)
@@ -165,6 +172,24 @@ export default function DemoSection() {
 
   const onFileSelect = useCallback((e) => {
     handleFile(e.target.files[0])
+  }, [handleFile])
+
+  const loadSampleRoom = useCallback(async (sceneId) => {
+    setFileName(`${sceneId}.ply`)
+    setStatus('fetching')
+    setError('')
+    setResult(null)
+
+    try {
+      const res = await fetch(`/sample_rooms/${sceneId}.ply`)
+      if (!res.ok) throw new Error('Sample file not found')
+      const blob = await res.blob()
+      const file = new File([blob], `${sceneId}.ply`, { type: 'application/octet-stream' })
+      handleFile(file)
+    } catch (err) {
+      setError(err.message || 'Failed to load sample room.')
+      setStatus('error')
+    }
   }, [handleFile])
 
   // Compute colors for raw (gold) and predicted (class colors)
@@ -225,7 +250,32 @@ export default function DemoSection() {
                 <div className="upload-icon">📁</div>
                 <h3>Drop your .ply file here</h3>
                 <p>or click to browse • Supports binary and ASCII PLY format</p>
-                <p className="upload-hint">Try uploading <code>real_room.ply</code> from the project folder</p>
+                <div 
+                  className="upload-hint real-room-btn" 
+                  onClick={(e) => { e.stopPropagation(); loadSampleRoom('real_room'); }}
+                  style={{ 
+                    display: 'inline-block', padding: '0.5rem 1rem', 
+                    background: 'rgba(92,64,51,0.06)', borderRadius: '6px', 
+                    marginTop: '1.5rem', cursor: 'pointer', transition: 'all 0.3s',
+                    border: '1px solid rgba(92,64,51,0.15)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(92,64,51,0.12)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(92,64,51,0.06)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  🚀 Quick Test: Run with <code>real_room.ply</code>
+                </div>
+              </>
+            )}
+            {status === 'fetching' && (
+              <>
+                <div className="upload-icon spinning">⬇️</div>
+                <h3>Downloading sample room {fileName}...</h3>
               </>
             )}
             {status === 'uploading' && (
@@ -249,6 +299,27 @@ export default function DemoSection() {
                 <p>Click to try again</p>
               </>
             )}
+          </div>
+        )}
+
+        {/* Sample Rooms Grid */}
+        {status !== 'done' && (
+          <div className="sample-rooms-section">
+            <h3 className="sample-rooms-title">Or try a sample room</h3>
+            <div className="sample-rooms-grid">
+              {SAMPLE_SCENES.map(sceneId => (
+                <div 
+                  key={sceneId} 
+                  className={`sample-room-card ${(status !== 'idle' && status !== 'error') ? 'disabled' : ''}`}
+                  onClick={() => (status === 'idle' || status === 'error') ? loadSampleRoom(sceneId) : null}
+                >
+                  <img src={`/sample_rooms/${sceneId}.jpg`} alt={sceneId} className="sample-room-img" />
+                  <div className="sample-room-overlay">
+                    <span>{sceneId}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

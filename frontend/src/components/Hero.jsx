@@ -85,13 +85,13 @@ export default function Hero() {
               <p>Point Cloud → Semantic Labels</p>
             </div>
           </div>
-          <div className="float-tag" style={{ top: '10%', right: '-15%', animationDelay: '0.5s' }}>
+          <div className="float-tag" style={{ top: '10%', right: '-5%', animationDelay: '0.5s' }}>
             <span className="tag-dot green" /> Wall Detected
           </div>
           <div className="float-tag" style={{ bottom: '15%', left: '-10%', animationDelay: '1.2s' }}>
             <span className="tag-dot gold" /> Table Classified
           </div>
-          <div className="float-tag" style={{ top: '50%', right: '-20%', animationDelay: '1.8s' }}>
+          <div className="float-tag" style={{ top: '50%', right: '-10%', animationDelay: '1.8s' }}>
             <span className="tag-dot maroon" /> Chair Identified
           </div>
         </div>
